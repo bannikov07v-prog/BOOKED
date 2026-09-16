@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="BOOKED помогает барбершопам, салонам и частным мастерам увидеть потерянную выручку из-за пустых окон и вернуть клиентов через повторные записи." />
+  <title>BOOKED — больше записей, меньше пустых окон</title>
+  <script src="config.js"></script>
+  <style>
+    :root {
+      --bg: #050607;
+      --card: rgba(255, 255, 255, 0.075);
+      --card-strong: rgba(255, 255, 255, 0.12);
+      --line: rgba(255, 255, 255, 0.14);
+      --text: #f7f8f4;
+      --muted: #a5aca3;
+      --muted-2: #727a73;
+      --lime: #baff18;
+      --lime-2: #7fe90d;
+      --green: #1ed760;
+      --dark-lime: #1d2a08;
+      --danger: #ff6b6b;
+      --shadow: 0 28px 90px rgba(0, 0, 0, 0.42);
+      --radius: 28px;
+      --max: 1160px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 18% 12%, rgba(186, 255, 24, 0.18), transparent 28%),
+        radial-gradient(circle at 82% 18%, rgba(30, 215, 96, 0.12), transparent 26%),
+        linear-gradient(180deg, #080a09 0%, #050607 44%, #080a09 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 58px 58px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent 80%);
+      z-index: -2;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, select { font: inherit; }
+    button { border: 0; cursor: pointer; }
+
+    .page-glow {
+      position: fixed;
+      width: 520px;
+      height: 520px;
+      border-radius: 999px;
+      background: rgba(186, 255, 24, 0.16);
+      filter: blur(70px);
+      left: -180px;
+      top: 120px;
+      pointer-events: none;
+      z-index: -1;
+      animation: floatGlow 10s ease-in-out infinite alternate;
+    }
+
+    .wrap {
+      width: min(100% - 32px, var(--max));
+      margin: 0 auto;
+    }
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(22px);
+      background: rgba(5, 6, 7, 0.68);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .header-inner {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 950;
+      letter-spacing: -0.05em;
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      color: #061006;
+      background: linear-gradient(135deg, var(--lime), var(--green));
+      box-shadow: 0 0 34px rgba(186,255,24,0.22);
+      transform: rotate(-4deg);
+    }
+
+    .brand span:last-child {
+      font-size: 20px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      color: #cdd4ca;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .nav a { opacity: 0.78; transition: 0.2s; }
+    .nav a:hover { opacity: 1; color: var(--lime); }
+
+    .header-cta {
+      padding: 12px 17px;
+      border-radius: 999px;
+      color: #071007;
+      background: var(--lime);
+      font-size: 14px;
+      font-weight: 900;
+      box-shadow: 0 14px 36px rgba(186, 255, 24, 0.16);
+    }
+
+    .hero {
+      padding: 78px 0 42px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+      align-items: center;
+      gap: 46px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 13px;
+      border: 1px solid rgba(186,255,24,0.28);
+      background: rgba(186,255,24,0.08);
+      border-radius: 999px;
+      color: #dafc8a;
+      font-size: 13px;
+      font-weight: 850;
+      letter-spacing: 0.02em;
+      margin-bottom: 22px;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--lime);
+      box-shadow: 0 0 20px rgba(186,255,24,0.9);
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      max-width: 760px;
+      margin-bottom: 24px;
+      font-size: clamp(44px, 7vw, 86px);
+      line-height: 0.93;
+      letter-spacing: -0.075em;
+      font-weight: 980;
+    }
+
+    .accent {
+      color: var(--lime);
+      text-shadow: 0 0 42px rgba(186,255,24,0.22);
+    }
+
+    .hero-text {
+      max-width: 640px;
+      color: #c2c9c0;
+      font-size: clamp(17px, 2vw, 22px);
+      line-height: 1.55;
+      margin-bottom: 32px;
+    }
+
+    .hero-actions, .row-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 54px;
+      padding: 0 22px;
+      border-radius: 18px;
+      font-weight: 950;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary {
+      color: #061006;
+      background: linear-gradient(135deg, var(--lime), #a2ff4d);
+      box-shadow: 0 18px 48px rgba(186,255,24,0.22);
+    }
+
+    .btn-secondary {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.07);
+      color: #eef4ea;
+    }
+
+    .btn-secondary:hover { border-color: rgba(186,255,24,0.45); }
+
+    .hero-proof {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-top: 32px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .hero-proof span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hero-proof span::before {
+      content: "✓";
+      color: var(--lime);
+    }
+
+    .dashboard-card {
+      position: relative;
+      min-height: 560px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: linear-gradient(180deg, rgba(255,255,255,0.13), rgba(255,255,255,0.055));
+      border-radius: 38px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .dashboard-card::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      background: radial-gradient(circle at 30% 0%, rgba(186,255,24,0.25), transparent 38%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .phone {
+      position: relative;
+      border-radius: 32px;
+      padding: 22px;
+      min-height: 510px;
+      background: rgba(2, 4, 4, 0.76);
+      border: 1px solid rgba(255,255,255,0.1);
+      overflow: hidden;
+    }
+
+    .phone-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #dfe8d9;
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+
+    .status-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #d8ff8f;
+    }
+
+    .status-dot::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--lime);
+      box-shadow: 0 0 20px rgba(186,255,24,0.85);
+    }
+
+    .loss-widget {
+      padding: 22px;
+      border-radius: 26px;
+      background: linear-gradient(135deg, rgba(186,255,24,0.18), rgba(255,255,255,0.06));
+      border: 1px solid rgba(186,255,24,0.22);
+      margin-bottom: 18px;
+    }
+
+    .loss-widget small {
+      display: block;
+      color: #c9d1c6;
+      margin-bottom: 8px;
+      font-weight: 750;
+    }
+
+    .loss-number {
+      color: var(--lime);
+      font-size: 42px;
+      line-height: 1;
+      letter-spacing: -0.06em;
+      font-weight: 980;
+    }
+
+    .schedule {
+      display: grid;
+      gap: 12px;
+    }
+
+    .slot {
+      display: grid;
+      grid-template-columns: 74px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.065);
+      border: 1px solid rgba(255,255,255,0.08);
+      animation: riseIn 0.7s ease both;
+    }
+
+    .slot:nth-child(2) { animation-delay: 0.08s; }
+    .slot:nth-child(3) { animation-delay: 0.16s; }
+    .slot:nth-child(4) { animation-delay: 0.24s; }
+
+    .slot-time { color: #f2f7ee; font-weight: 950; }
+    .slot-name { color: #aeb8aa; font-size: 14px; }
+    .slot-badge {
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .slot.empty .slot-badge { color: #111; background: var(--lime); }
+    .slot.busy .slot-badge { color: #dfe9dc; background: rgba(255,255,255,0.12); }
+    .slot.returned .slot-badge { color: #071007; background: #8dff77; }
+
+    .floating-note {
+      position: absolute;
+      right: 18px;
+      bottom: 22px;
+      width: min(275px, 72%);
+      padding: 17px;
+      border-radius: 22px;
+      color: #071007;
+      background: var(--lime);
+      box-shadow: 0 18px 55px rgba(186,255,24,0.24);
+      font-weight: 850;
+      animation: bob 4s ease-in-out infinite;
+    }
+
+    .section {
+      padding: 54px 0;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .section h2 {
+      font-size: clamp(32px, 5vw, 58px);
+      line-height: 0.98;
+      letter-spacing: -0.06em;
+      margin-bottom: 0;
+    }
+
+    .section-lead {
+      max-width: 480px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.07);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .calculator {
+      display: grid;
+      grid-template-columns: minmax(0, 0.96fr) minmax(320px, 0.7fr);
+      gap: 18px;
+      padding: 22px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .field { display: grid; gap: 8px; }
+    label {
+      color: #d9e0d6;
+      font-size: 14px;
+      font-weight: 850;
+    }
+
+    input, select {
+      width: 100%;
+      min-height: 58px;
+      padding: 0 16px;
+      color: #fff;
+      background: rgba(0,0,0,0.34);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 18px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: rgba(186,255,24,0.72);
+      box-shadow: 0 0 0 4px rgba(186,255,24,0.09);
+    }
+
+    .calc-actions { margin-top: 16px; }
+
+    .result-box {
+      position: relative;
+      overflow: hidden;
+      padding: 24px;
+      border-radius: 24px;
+      background: #0c100d;
+      border: 1px solid rgba(186,255,24,0.16);
+    }
+
+    .result-box::after {
+      content: "";
+      position: absolute;
+      width: 210px;
+      height: 210px;
+      right: -80px;
+      top: -80px;
+      border-radius: 999px;
+      background: rgba(186,255,24,0.17);
+      filter: blur(18px);
+    }
+
+    .result-label {
+      position: relative;
+      color: var(--muted);
+      font-weight: 800;
+      margin-bottom: 10px;
+      z-index: 1;
+    }
+
+    .result-value {
+      position: relative;
+      color: var(--lime);
+      font-size: clamp(34px, 5vw, 56px);
+      font-weight: 980;
+      letter-spacing: -0.07em;
+      margin-bottom: 14px;
+      z-index: 1;
+    }
+
+    .result-copy {
+      position: relative;
+      color: #cbd4c7;
+      line-height: 1.55;
+      margin-bottom: 18px;
+      z-index: 1;
+    }
+
+    .mini-note {
+      color: var(--muted-2);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .feature-card {
+      padding: 24px;
+      min-height: 228px;
+    }
+
+    .icon {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: rgba(186,255,24,0.12);
+      border: 1px solid rgba(186,255,24,0.2);
+      color: var(--lime);
+      font-weight: 950;
+      margin-bottom: 18px;
+    }
+
+    .feature-card h3, .price-card h3, .step h3 {
+      font-size: 22px;
+      letter-spacing: -0.03em;
+      margin-bottom: 10px;
+    }
+
+    .feature-card p, .step p, .price-card p, .faq p {
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 0;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .step {
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .step-number {
+      color: rgba(186,255,24,0.24);
+      font-size: 54px;
+      line-height: 1;
+      font-weight: 980;
+      letter-spacing: -0.08em;
+      margin-bottom: 14px;
+    }
+
+    .pricing {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .price-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 420px;
+      padding: 24px;
+    }
+
+    .price-card.featured {
+      border-color: rgba(186,255,24,0.42);
+      background: linear-gradient(180deg, rgba(186,255,24,0.13), rgba(255,255,255,0.065));
+    }
+
+    .price {
+      margin: 20px 0 16px;
+      color: #fff;
+      font-size: 42px;
+      font-weight: 980;
+      letter-spacing: -0.06em;
+    }
+
+    .price small {
+      color: var(--muted);
+      font-size: 15px;
+      letter-spacing: 0;
+      font-weight: 750;
+    }
+
+    .ticks {
+      display: grid;
+      gap: 11px;
+      margin: 0 0 22px;
+      padding: 0;
+      list-style: none;
+      color: #dce5d8;
+      line-height: 1.45;
+    }
+
+    .ticks li {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 8px;
+    }
+
+    .ticks li::before {
+      content: "✓";
+      color: var(--lime);
+      font-weight: 950;
+    }
+
+    .price-card .btn { margin-top: auto; width: 100%; }
+
+    .lead-section {
+      display: grid;
+      grid-template-columns: minmax(0, 0.85fr) minmax(360px, 1fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .telegram-card, .lead-card { padding: 24px; }
+    .telegram-card {
+      background: linear-gradient(135deg, rgba(186,255,24,0.14), rgba(255,255,255,0.06));
+    }
+
+    .telegram-links {
+      display: grid;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .telegram-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(0,0,0,0.24);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #eef4ea;
+      font-weight: 850;
+    }
+
+    .lead-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .two-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .error, .success {
+      display: none;
+      padding: 14px 16px;
+      border-radius: 16px;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .error {
+      color: #ffd3d3;
+      background: rgba(255,107,107,0.12);
+      border: 1px solid rgba(255,107,107,0.25);
+    }
+
+    .success {
+      color: #e8ffd2;
+      background: rgba(186,255,24,0.11);
+      border: 1px solid rgba(186,255,24,0.25);
+    }
+
+    .faq-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .faq {
+      padding: 22px;
+    }
+
+    .footer {
+      padding: 36px 0 48px;
+      color: var(--muted-2);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin-top: 40px;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: 0.72s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes floatGlow {
+      from { transform: translate3d(0,0,0) scale(1); }
+      to { transform: translate3d(40px,70px,0) scale(1.1); }
+    }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0) rotate(-1deg); }
+      50% { transform: translateY(-10px) rotate(1deg); }
+    }
+
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid, .calculator, .lead-section { grid-template-columns: 1fr; }
+      .dashboard-card { min-height: auto; }
+      .cards, .pricing { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: repeat(2, 1fr); }
+      .section-head { align-items: start; flex-direction: column; }
+      .form-grid { grid-template-columns: 1fr; }
+      .nav { display: none; }
+    }
+
+    @media (max-width: 620px) {
+      .wrap { width: min(100% - 22px, var(--max)); }
+      .hero { padding-top: 46px; }
+      .header-inner { min-height: 68px; }
+      .header-cta { display: none; }
+      h1 { font-size: 48px; }
+      .dashboard-card, .calculator, .panel { border-radius: 22px; }
+      .dashboard-card, .calculator, .lead-card, .telegram-card, .price-card, .feature-card, .step, .faq { padding: 18px; }
+      .phone { min-height: 470px; border-radius: 24px; padding: 16px; }
+      .slot { grid-template-columns: 60px 1fr; }
+      .slot-badge { grid-column: 2; width: fit-content; }
+      .floating-note { position: static; width: 100%; margin-top: 16px; }
+      .steps, .faq-grid, .two-cols { grid-template-columns: 1fr; }
+      .btn { width: 100%; }
+      .footer-inner { display: grid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-glow"></div>
+
+  <header class="header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#top" aria-label="BOOKED">
+        <span class="brand-mark">B✓</span>
+        <span>BOOKED</span>
+      </a>
+      <nav class="nav" aria-label="Навигация">
+        <a href="#calculator">Калькулятор</a>
+        <a href="#how">Как работает</a>
+        <a href="#pricing">Оплата</a>
+        <a href="#lead">Telegram</a>
+      </nav>
+      <a class="header-cta" href="#calculator">Посчитать потери</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="reveal visible">
+          <div class="eyebrow">для барбершопов, салонов и частных мастеров</div>
+          <h1>Пустые окна <span class="accent">не должны</span> съедать выручку</h1>
+          <p class="hero-text">BOOKED показывает, сколько денег теряется на свободном времени мастеров, помогает собрать заявку и довести клиента до разбора или оплаты.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#calculator">Рассчитать за 1 минуту</a>
+            <a class="btn btn-secondary js-telegram-bot" href="https://t.me/BOOKED_leads_bot" target="_blank" rel="noopener">Открыть Telegram-бота</a>
+          </div>
+          <div class="hero-proof">
+            <span>расчёт без регистрации</span>
+            <span>заявки в Telegram</span>
+            <span>готово к платёжной ссылке</span>
+          </div>
+        </div>
+
+        <aside class="dashboard-card reveal visible" aria-label="Пример расписания BOOKED">
+          <div class="phone">
+            <div class="phone-top">
+              <span>BOOKED live</span>
+              <span class="status-dot">приём заявок</span>
+            </div>
+            <div class="loss-widget">
+              <small>потенциал возврата за месяц</small>
+              <div class="loss-number" data-hero-loss>70 254 ₽</div>
+            </div>
+            <div class="schedule">
+              <div class="slot empty">
+                <div class="slot-time">10:00</div>
+                <div>
+                  <strong>Свободное окно</strong>
+                  <div class="slot-name">мастер простаивает</div>
+                </div>
+                <span class="slot-badge">найти клиента</span>
+              </div>
+              <div class="slot busy">
+                <div class="slot-time">12:30</div>
+                <div>
+                  <strong>Запись</strong>
+                  <div class="slot-name">клиент подтверждён</div>
+                </div>
+                <span class="slot-badge">занято</span>
+              </div>
+              <div class="slot empty">
+                <div class="slot-time">15:00</div>
+                <div>
+                  <strong>Свободное окно</strong>
+                  <div class="slot-name">можно вернуть повторный визит</div>
+                </div>
+                <span class="slot-badge">напомнить</span>
+              </div>
+              <div class="slot returned">
+                <div class="slot-time">17:30</div>
+                <div>
+                  <strong>Клиент вернулся</strong>
+                  <div class="slot-name">заявка пришла в Telegram</div>
+                </div>
+                <span class="slot-badge">booked</span>
+              </div>
+            </div>
+            <div class="floating-note">После расчёта сайт ведёт человека к заявке, Telegram-боту или оплате разбора.</div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" id="calculator">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <h2>Сначала покажи владельцу сумму потерь</h2>
+          <p class="section-lead">Когда человек видит конкретную цифру, ему проще оставить заявку и купить разбор. Это главный крючок сайта.</p>
+        </div>
+
+        <div class="calculator panel reveal">
+          <div>
+            <div class="form-grid">
+              <div class="field">
+                <label for="masters">Количество мастеров</label>
+                <input id="masters" type="number" min="1" value="3" inputmode="numeric" />
+              </div>
+              <div class="field">
+                <label for="ticket">Средний чек, ₽</label>
+                <input id="ticket" type="number" min="1" value="1800" inputmode="numeric" />
+              </div>
+              <div class="field">
+                <label for="slots">Свободных окон в неделю на мастера</label>
+                <input id="slots" type="number" min="0" value="3" inputmode="numeric" />
+              </div>
+            </div>
+            <div class="calc-actions row-actions">
+              <button class="btn btn-primary" id="calculateButton" type="button">Рассчитать выручку</button>
+              <a class="btn btn-secondary" href="#lead">Получить разбор</a>
+            </div>
+            <p class="mini-note" style="margin-top:16px;">Формула: мастера × средний чек × свободные окна × 4,33 недели. Это оценка потенциала, а не обещание дохода.</p>
+          </div>
+
+          <div class="result-box">
+            <div class="result-label">примерная недополученная выручка</div>
+            <div class="result-value" id="resultValue">70 146 ₽</div>
+            <p class="result-copy" id="resultCopy">Даже несколько пустых окон в неделю могут превращаться в заметную сумму за месяц.</p>
+            <a class="btn btn-primary" href="#lead">Отправить заявку</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <h2>Что продаёт BOOKED</h2>
+          <p class="section-lead">Не абстрактную автоматизацию, а понятный результат: меньше свободных окон и больше повторных записей.</p>
+        </div>
+        <div class="cards">
+          <article class="feature-card panel reveal">
+            <div class="icon">01</div>
+            <h3>Показывает проблему в деньгах</h3>
+            <p>Калькулятор переводит свободные окна в рубли, поэтому владелец быстрее понимает, почему с этим стоит разобраться.</p>
+          </article>
+          <article class="feature-card panel reveal">
+            <div class="icon">02</div>
+            <h3>Собирает тёплые заявки</h3>
+            <p>Форма забирает имя, Telegram, название салона и расчёт. Менеджеру не нужно вытягивать базовую информацию вручную.</p>
+          </article>
+          <article class="feature-card panel reveal">
+            <div class="icon">03</div>
+            <h3>Ведёт к оплате или боту</h3>
+            <p>На сайте уже есть блок платного разбора, кнопки оплаты и переходы в Telegram. Осталось вставить настоящие платёжные ссылки.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="how">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <h2>Как это работает</h2>
+          <p class="section-lead">Воронка короткая: расчёт → заявка → Telegram → разбор → оплата настройки.</p>
+        </div>
+        <div class="steps">
+          <article class="step panel reveal">
+            <div class="step-number">1</div>
+            <h3>Владелец считает потери</h3>
+            <p>Указывает мастеров, средний чек и свободные окна.</p>
+          </article>
+          <article class="step panel reveal">
+            <div class="step-number">2</div>
+            <h3>Оставляет заявку</h3>
+            <p>Данные уходят в backend и дальше в Telegram-бота.</p>
+          </article>
+          <article class="step panel reveal">
+            <div class="step-number">3</div>
+            <h3>Получает разбор</h3>
+            <p>Ты показываешь, где повторные записи можно вернуть быстрее.</p>
+          </article>
+          <article class="step panel reveal">
+            <div class="step-number">4</div>
+            <h3>Покупает настройку</h3>
+            <p>Платёжная кнопка ведёт на готовую страницу оплаты.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="pricing">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <h2>Блок оплаты уже подготовлен</h2>
+          <p class="section-lead">Добавь платёжные ссылки в `config.js`, и кнопки начнут вести на оплату. До этого они отправляют клиента в Telegram.</p>
+        </div>
+        <div class="pricing">
+          <article class="price-card panel reveal">
+            <h3>Мини-разбор</h3>
+            <p>Подходит, чтобы собрать первые заявки и начать диалог.</p>
+            <div class="price">0 ₽</div>
+            <ul class="ticks">
+              <li>расчёт потерь</li>
+              <li>заявка в Telegram</li>
+              <li>короткая рекомендация</li>
+            </ul>
+            <button class="btn btn-secondary js-plan" type="button" data-plan="free">Получить бесплатно</button>
+          </article>
+
+          <article class="price-card panel featured reveal">
+            <h3>Разбор + план</h3>
+            <p>Главный продукт для первой продажи после калькулятора.</p>
+            <div class="price">990 ₽ <small>/ разово</small></div>
+            <ul class="ticks">
+              <li>анализ свободных окон</li>
+              <li>план повторных записей</li>
+              <li>шаблоны сообщений клиентам</li>
+            </ul>
+            <button class="btn btn-primary js-plan" type="button" data-plan="audit">Оплатить разбор</button>
+          </article>
+
+          <article class="price-card panel reveal">
+            <h3>Настройка BOOKED</h3>
+            <p>Для салонов, которым нужен готовый процесс заявок и возврата клиентов.</p>
+            <div class="price">от 4 990 ₽</div>
+            <ul class="ticks">
+              <li>упаковка оффера</li>
+              <li>сценарии напоминаний</li>
+              <li>подключение заявки к боту</li>
+            </ul>
+            <button class="btn btn-secondary js-plan" type="button" data-plan="setup">Обсудить настройку</button>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="lead">
+      <div class="wrap lead-section">
+        <aside class="telegram-card panel reveal">
+          <div class="eyebrow">Telegram подключён в интерфейсе</div>
+          <h2>Заявки идут туда, где ты быстрее ответишь</h2>
+          <p class="section-lead">Если backend уже размещён на сервере, форма отправит заявку прямо в бота. Если сервер ещё не запущен, сайт откроет Telegram-бота и скопирует текст заявки.</p>
+          <div class="telegram-links">
+            <a class="telegram-link js-telegram-channel" href="https://t.me/booked_ru" target="_blank" rel="noopener"><span>Канал BOOKED</span><span>↗</span></a>
+            <a class="telegram-link js-telegram-bot" href="https://t.me/BOOKED_leads_bot" target="_blank" rel="noopener"><span>Бот заявок</span><span>↗</span></a>
+          </div>
+        </aside>
+
+        <section class="lead-card panel reveal">
+          <h2>Получить разбор</h2>
+          <p class="section-lead" style="margin-bottom:22px;">Заполни форму как будущий клиент. Так будет выглядеть путь заявки на сайте.</p>
+          <form class="lead-form" id="leadForm">
+            <div class="two-cols">
+              <div class="field">
+                <label for="name">Имя</label>
+                <input id="name" name="name" type="text" placeholder="Например: Алексей" autocomplete="name" required />
+              </div>
+              <div class="field">
+                <label for="telegram">Telegram</label>
+                <input id="telegram" name="telegram" type="text" placeholder="@username" autocomplete="off" required />
+              </div>
+            </div>
+            <div class="two-cols">
+              <div class="field">
+                <label for="business">Название салона</label>
+                <input id="business" name="business" type="text" placeholder="Например: Black Barber" required />
+              </div>
+              <div class="field">
+                <label for="city">Город</label>
+                <input id="city" name="city" type="text" placeholder="Москва" />
+              </div>
+            </div>
+            <button class="btn btn-primary" id="leadButton" type="submit">Отправить заявку в BOOKED</button>
+            <div class="error" id="errorMessage"></div>
+            <div class="success" id="successMessage"></div>
+          </form>
+        </section>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <h2>FAQ для доверия</h2>
+          <p class="section-lead">Эти ответы закрывают сомнения перед заявкой и оплатой.</p>
+        </div>
+        <div class="faq-grid">
+          <article class="faq panel reveal">
+            <h3>Это гарантия выручки?</h3>
+            <p>Нет. Калькулятор показывает ориентировочный потенциал по введённым данным. Реальный результат зависит от базы клиентов, сервиса, цен и работы администратора.</p>
+          </article>
+          <article class="faq panel reveal">
+            <h3>Нужно ставить сложную CRM?</h3>
+            <p>На первом этапе нет. Можно начать с расчёта, Telegram-заявок и простого плана повторных записей.</p>
+          </article>
+          <article class="faq panel reveal">
+            <h3>Как подключается оплата?</h3>
+            <p>Через платёжную ссылку ЮKassa, CloudPayments, Robokassa или другого сервиса. Ссылку нужно вставить в файл `config.js`.</p>
+          </article>
+          <article class="faq panel reveal">
+            <h3>Почему сайт не хранит ключи оплаты?</h3>
+            <p>Ключи нельзя хранить в публичном HTML. Для API-оплаты нужен backend, а для быстрого старта безопаснее использовать готовую платёжную страницу.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <strong>BOOKED — больше записей. Меньше пустых окон.</strong>
+      <span>Самозанятый: Банников Валерий Львович · ИНН: 343657907002</span>
+    </div>
+  </footer>
+
+  <script>
+    const defaultConfig = {
+      backendUrl: "",
+      telegramBotUrl: "https://t.me/BOOKED_leads_bot",
+      telegramChannelUrl: "https://t.me/booked_ru",
+      paymentLinks: {
+        audit: "",
+        setup: ""
+      }
+    };
+
+    const config = {
+      ...defaultConfig,
+      ...(window.BOOKED_CONFIG || {}),
+      paymentLinks: {
+        ...defaultConfig.paymentLinks,
+        ...((window.BOOKED_CONFIG && window.BOOKED_CONFIG.paymentLinks) || {})
+      }
+    };
+
+    const state = {
+      masters: 3,
+      average_ticket: 1800,
+      free_slots: 3,
+      monthly_loss: 3 * 1800 * 3 * 4.33
+    };
+
+    const formatter = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
+
+    function formatRub(value) {
+      return `${formatter.format(Math.round(value))} ₽`;
+    }
+
+    function byId(id) {
+      return document.getElementById(id);
+    }
+
+    function updateTelegramLinks() {
+      document.querySelectorAll(".js-telegram-bot").forEach((link) => {
+        link.href = config.telegramBotUrl;
+      });
+      document.querySelectorAll(".js-telegram-channel").forEach((link) => {
+        link.href = config.telegramChannelUrl;
+      });
+    }
+
+    function setResult() {
+      byId("resultValue").textContent = formatRub(state.monthly_loss);
+      document.querySelector("[data-hero-loss]").textContent = formatRub(state.monthly_loss);
+      byId("resultCopy").textContent = `При таких вводных свободные окна могут стоить около ${formatRub(state.monthly_loss)} в месяц. Это хороший повод вернуть клиентов через повторные записи.`;
+    }
+
+    function calculate() {
+      const masters = Number(byId("masters").value);
+      const ticket = Number(byId("ticket").value);
+      const slots = Number(byId("slots").value);
+
+      if (!masters || masters <= 0 || !ticket || ticket <= 0 || slots < 0) {
+        showError("Проверь значения в калькуляторе.");
+        return;
+      }
+
+      state.masters = masters;
+      state.average_ticket = ticket;
+      state.free_slots = slots;
+      state.monthly_loss = masters * ticket * slots * 4.33;
+      setResult();
+      hideMessage();
+      byId("lead").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function leadText(formData, plan = "Разбор BOOKED") {
+      return [
+        "🚀 Заявка BOOKED",
+        `План: ${plan}`,
+        `Имя: ${formData.name || "не указано"}`,
+        `Telegram: ${formData.telegram || "не указан"}`,
+        `Салон: ${formData.business || "не указан"}`,
+        `Город: ${formData.city || "не указан"}`,
+        "",
+        "Данные калькулятора:",
+        `Мастеров: ${state.masters}`,
+        `Средний чек: ${formatRub(state.average_ticket)}`,
+        `Свободных окон в неделю на мастера: ${state.free_slots}`,
+        `Потенциал за месяц: ${formatRub(state.monthly_loss)}`
+      ].join("\n");
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function showError(text) {
+      const el = byId("errorMessage");
+      el.textContent = text;
+      el.style.display = "block";
+      byId("successMessage").style.display = "none";
+    }
+
+    function showSuccess(text) {
+      const el = byId("successMessage");
+      el.textContent = text;
+      el.style.display = "block";
+      byId("errorMessage").style.display = "none";
+    }
+
+    function hideMessage() {
+      byId("errorMessage").style.display = "none";
+      byId("successMessage").style.display = "none";
+    }
+
+    async function submitLead(event) {
+      event.preventDefault();
+      hideMessage();
+
+      const button = byId("leadButton");
+      const data = Object.fromEntries(new FormData(event.currentTarget).entries());
+
+      if (!data.name || !data.telegram || !data.business) {
+        showError("Заполни имя, Telegram и название салона.");
+        return;
+      }
+
+      const payload = {
+        name: data.name.trim(),
+        telegram: data.telegram.trim(),
+        barbershop: data.business.trim(),
+        city: (data.city || "").trim(),
+        masters: state.masters,
+        average_ticket: state.average_ticket,
+        free_slots: state.free_slots,
+        monthly_loss: state.monthly_loss
+      };
+
+      button.disabled = true;
+      button.textContent = "Отправляем...";
+
+      if (config.backendUrl) {
+        try {
+          const response = await fetch(`${config.backendUrl.replace(/\/$/, "")}/lead`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          const answer = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            throw new Error(answer.detail || "Не удалось отправить заявку.");
+          }
+
+          showSuccess("Заявка отправлена в Telegram-бота. Проверь сообщения.");
+          event.currentTarget.reset();
+          button.disabled = false;
+          button.textContent = "Отправить заявку в BOOKED";
+          return;
+        } catch (error) {
+          console.warn(error);
+        }
+      }
+
+      const text = leadText({ name: payload.name, telegram: payload.telegram, business: payload.barbershop, city: payload.city });
+      const copied = await copyText(text);
+      window.open(config.telegramBotUrl, "_blank", "noopener");
+      showSuccess(copied ? "Текст заявки скопирован. Вставь его в открывшийся Telegram-бот." : "Открылся Telegram-бот. Отправь туда данные заявки вручную.");
+
+      button.disabled = false;
+      button.textContent = "Отправить заявку в BOOKED";
+    }
+
+    async function handlePlan(button) {
+      const plan = button.dataset.plan;
+      if (plan === "free") {
+        byId("lead").scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+
+      const paymentLink = config.paymentLinks[plan];
+      if (paymentLink) {
+        window.open(paymentLink, "_blank", "noopener");
+        return;
+      }
+
+      const planName = plan === "audit" ? "Разбор + план за 990 ₽" : "Настройка BOOKED";
+      await copyText(`Здравствуйте! Хочу оплатить: ${planName}. Сайт BOOKED показал потенциал: ${formatRub(state.monthly_loss)} в месяц.`);
+      window.open(`${config.telegramBotUrl}?start=${encodeURIComponent(plan)}`, "_blank", "noopener");
+    }
+
+    function initReveal() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.14 });
+
+      document.querySelectorAll(".reveal:not(.visible)").forEach((el) => observer.observe(el));
+    }
+
+    updateTelegramLinks();
+    setResult();
+    initReveal();
+
+    byId("calculateButton").addEventListener("click", calculate);
+    byId("leadForm").addEventListener("submit", submitLead);
+    document.querySelectorAll(".js-plan").forEach((button) => {
+      button.addEventListener("click", () => handlePlan(button));
+    });
+  </script>
+</body>
+</html>
