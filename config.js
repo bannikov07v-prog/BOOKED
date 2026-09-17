@@ -3,11 +3,12 @@ window.BOOKED_CONFIG = {
   // Пример: "https://booked-backend.onrender.com"
   backendUrl: "",
 
-  telegramBotUrl: "https://t.me/BOOKED_leads_bot",
-  telegramChannelUrl: "https://t.me/booked_ru",
+  telegramContactUrl: "https://t.me/goldsize",
+  telegramBotUrl: "https://t.me/goldsize",
+  telegramChannelUrl: "https://t.me/goldsize",
 
   // Вставь сюда реальные платёжные ссылки из ЮKassa / CloudPayments / Robokassa.
-  // Пока ссылки пустые, кнопки оплаты будут вести клиента в Telegram-бота.
+  // Пока ссылки пустые, кнопки оплаты будут вести клиента в Telegram @goldsize.
   paymentLinks: {
     audit: "",
     setup: ""

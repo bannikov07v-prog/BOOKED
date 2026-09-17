@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="BOOKED помогает барбершопам, салонам и частным мастерам увидеть потерянную выручку из-за пустых окон и вернуть клиентов через повторные записи." />
   <title>BOOKED — больше записей, меньше пустых окон</title>
-  <script src="config.js"></script>
+  <script src="config.js?v=goldsize-final"></script>
   <style>
     :root {
       --bg: #050607;
@@ -788,7 +788,7 @@
           <p class="hero-text">BOOKED показывает, сколько денег теряется на свободном времени мастеров, помогает собрать заявку и довести клиента до разбора или оплаты.</p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="#calculator">Рассчитать за 1 минуту</a>
-            <a class="btn btn-secondary js-telegram-bot" href="https://t.me/BOOKED_leads_bot" target="_blank" rel="noopener">Открыть Telegram-бота</a>
+            <a class="btn btn-secondary js-telegram-bot" href="https://t.me/goldsize" target="_blank" rel="noopener">Написать в Telegram</a>
           </div>
           <div class="hero-proof">
             <span>расчёт без регистрации</span>
@@ -841,7 +841,7 @@
                 <span class="slot-badge">booked</span>
               </div>
             </div>
-            <div class="floating-note">После расчёта сайт ведёт человека к заявке, Telegram-боту или оплате разбора.</div>
+            <div class="floating-note">После расчёта сайт ведёт человека к заявке, твоему Telegram или оплате разбора.</div>
           </div>
         </aside>
       </div>
@@ -906,7 +906,7 @@
           </article>
           <article class="feature-card panel reveal">
             <div class="icon">03</div>
-            <h3>Ведёт к оплате или боту</h3>
+            <h3>Ведёт к оплате или связи</h3>
             <p>На сайте уже есть блок платного разбора, кнопки оплаты и переходы в Telegram. Осталось вставить настоящие платёжные ссылки.</p>
           </article>
         </div>
@@ -928,7 +928,7 @@
           <article class="step panel reveal">
             <div class="step-number">2</div>
             <h3>Оставляет заявку</h3>
-            <p>Данные уходят в backend и дальше в Telegram-бота.</p>
+            <p>Сайт копирует текст заявки и открывает Telegram @goldsize.</p>
           </article>
           <article class="step panel reveal">
             <div class="step-number">3</div>
@@ -982,7 +982,7 @@
             <ul class="ticks">
               <li>упаковка оффера</li>
               <li>сценарии напоминаний</li>
-              <li>подключение заявки к боту</li>
+              <li>подключение заявки к Telegram</li>
             </ul>
             <button class="btn btn-secondary js-plan" type="button" data-plan="setup">Обсудить настройку</button>
           </article>
@@ -993,12 +993,12 @@
     <section class="section" id="lead">
       <div class="wrap lead-section">
         <aside class="telegram-card panel reveal">
-          <div class="eyebrow">Telegram подключён в интерфейсе</div>
-          <h2>Заявки идут туда, где ты быстрее ответишь</h2>
-          <p class="section-lead">Если backend уже размещён на сервере, форма отправит заявку прямо в бота. Если сервер ещё не запущен, сайт откроет Telegram-бота и скопирует текст заявки.</p>
+          <div class="eyebrow">Живая связь в Telegram</div>
+          <h2>Заявки идут в @goldsize</h2>
+          <p class="section-lead">Сайт открывает твой Telegram @goldsize и копирует текст заявки. Клиент сразу пишет тебе напрямую.</p>
           <div class="telegram-links">
-            <a class="telegram-link js-telegram-channel" href="https://t.me/booked_ru" target="_blank" rel="noopener"><span>Канал BOOKED</span><span>↗</span></a>
-            <a class="telegram-link js-telegram-bot" href="https://t.me/BOOKED_leads_bot" target="_blank" rel="noopener"><span>Бот заявок</span><span>↗</span></a>
+            <a class="telegram-link js-telegram-channel" href="https://t.me/goldsize" target="_blank" rel="noopener"><span>Telegram @goldsize</span><span>↗</span></a>
+            <a class="telegram-link js-telegram-bot" href="https://t.me/goldsize" target="_blank" rel="noopener"><span>Написать тебе</span><span>↗</span></a>
           </div>
         </aside>
 
@@ -1065,20 +1065,23 @@
   <footer class="footer">
     <div class="wrap footer-inner">
       <strong>BOOKED — больше записей. Меньше пустых окон.</strong>
-      <span>Самозанятый: Банников Валерий Львович · ИНН: 343657907002</span>
+      <span>Самозанятый: Банников Валерий Львович · ИНН: 343657907002 · Telegram: @goldsize</span>
     </div>
   </footer>
 
   <script>
     const defaultConfig = {
       backendUrl: "",
-      telegramBotUrl: "https://t.me/BOOKED_leads_bot",
-      telegramChannelUrl: "https://t.me/booked_ru",
+      telegramContactUrl: "https://t.me/goldsize",
+      telegramBotUrl: "https://t.me/goldsize",
+      telegramChannelUrl: "https://t.me/goldsize",
       paymentLinks: {
         audit: "",
         setup: ""
       }
     };
+
+    const MAIN_TELEGRAM_URL = "https://t.me/goldsize";
 
     const config = {
       ...defaultConfig,
@@ -1088,6 +1091,10 @@
         ...((window.BOOKED_CONFIG && window.BOOKED_CONFIG.paymentLinks) || {})
       }
     };
+
+    config.telegramContactUrl = MAIN_TELEGRAM_URL;
+    config.telegramBotUrl = MAIN_TELEGRAM_URL;
+    config.telegramChannelUrl = MAIN_TELEGRAM_URL;
 
     const state = {
       masters: 3,
@@ -1224,7 +1231,7 @@
             throw new Error(answer.detail || "Не удалось отправить заявку.");
           }
 
-          showSuccess("Заявка отправлена в Telegram-бота. Проверь сообщения.");
+          showSuccess("Заявка отправлена в Telegram @goldsize. Проверь сообщения.");
           event.currentTarget.reset();
           button.disabled = false;
           button.textContent = "Отправить заявку в BOOKED";
@@ -1236,8 +1243,8 @@
 
       const text = leadText({ name: payload.name, telegram: payload.telegram, business: payload.barbershop, city: payload.city });
       const copied = await copyText(text);
-      window.open(config.telegramBotUrl, "_blank", "noopener");
-      showSuccess(copied ? "Текст заявки скопирован. Вставь его в открывшийся Telegram-бот." : "Открылся Telegram-бот. Отправь туда данные заявки вручную.");
+      window.open(config.telegramContactUrl, "_blank", "noopener");
+      showSuccess(copied ? "Текст заявки скопирован. Вставь его в открывшийся Telegram @goldsize." : "Открылся Telegram @goldsize. Отправь туда данные заявки вручную.");
 
       button.disabled = false;
       button.textContent = "Отправить заявку в BOOKED";
@@ -1258,7 +1265,7 @@
 
       const planName = plan === "audit" ? "Разбор + план за 990 ₽" : "Настройка BOOKED";
       await copyText(`Здравствуйте! Хочу оплатить: ${planName}. Сайт BOOKED показал потенциал: ${formatRub(state.monthly_loss)} в месяц.`);
-      window.open(`${config.telegramBotUrl}?start=${encodeURIComponent(plan)}`, "_blank", "noopener");
+      window.open(config.telegramContactUrl, "_blank", "noopener");
     }
 
     function initReveal() {
